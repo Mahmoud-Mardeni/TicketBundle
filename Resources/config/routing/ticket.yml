@@ -27,3 +27,13 @@ hackzilla_ticket_reply:
 hackzilla_ticket_attachment:
     path:  /attachment/{ticketMessageId}/download
     defaults: { _controller: "HackzillaTicketBundle:TicketAttachment:download" }
+
+hackzilla_ticket_assign:
+    path:  /{ticketId}/assign
+    defaults: { _controller: "HackzillaTicketBundle:Ticket:assign" }
+    methods: post
+
+hackzilla_ticket_view_all:
+    path:  /all
+    defaults: { _controller: "HackzillaTicketBundle:Ticket:viewAll" }
+

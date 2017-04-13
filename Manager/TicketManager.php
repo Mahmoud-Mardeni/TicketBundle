@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Hackzilla\Bundle\TicketBundle\Entity\TicketMessage;
 use Hackzilla\Bundle\TicketBundle\Model\TicketInterface;
 use Hackzilla\Bundle\TicketBundle\Model\TicketMessageInterface;
+use Hackzilla\Bundle\TicketBundle\Model\UserInterface;
 use Hackzilla\Bundle\TicketBundle\TicketRole;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -98,7 +99,7 @@ class TicketManager implements TicketManagerInterface
      * Update or Create a Ticket in the database
      * Update or Create a TicketMessage in the database.
      *
-     * @param TicketInterface        $ticket
+     * @param TicketInterface $ticket
      * @param TicketMessageInterface $message
      *
      * @return TicketInterface
@@ -107,6 +108,9 @@ class TicketManager implements TicketManagerInterface
     {
         if (is_null($ticket->getId())) {
             $this->objectManager->persist($ticket);
+        }
+        if($ticket->getStatus()==TicketMessage::STATUS_CLOSED){
+            $ticket->setStatus(TicketMessage::STATUS_REOPENED);
         }
         if (!\is_null($message)) {
             $message->setTicket($ticket);
@@ -120,7 +124,7 @@ class TicketManager implements TicketManagerInterface
     /**
      * Delete a ticket from the database.
      *
-     * @param TicketInterface $ticket*
+     * @param TicketInterface $ticket *
      */
     public function deleteTicket(TicketInterface $ticket)
     {
@@ -176,12 +180,12 @@ class TicketManager implements TicketManagerInterface
 
     /**
      * @param UserManagerInterface $userManager
-     * @param int                  $ticketStatus
-     * @param int                  $ticketPriority
+     * @param int $ticketStatus
+     * @param int $ticketPriority
      *
      * @return mixed
      */
-    public function getTicketList(UserManagerInterface $userManager, $ticketStatus, $ticketPriority = null)
+    public function getTicketList(UserManagerInterface $userManager, $ticketStatus, $ticketPriority = null, $assignedOnly = null,$check_security=true)
     {
         $query = $this->ticketRepository->createQueryBuilder('t')
 //            ->select($this->ticketClass.' t')
@@ -207,19 +211,35 @@ class TicketManager implements TicketManagerInterface
                 ->setParameter('priority', $ticketPriority);
         }
 
-        $user = $userManager->getCurrentUser();
+        if (!is_null($assignedOnly)) {
+            if ($assignedOnly) {
+                $query
+                    ->andWhere('t.assignedToUser is not null');
+            } else {
+                $query
+                    ->andWhere('t.assignedToUser is null');
+            }
+        }
 
-        if (\is_object($user)) {
-            if (!$userManager->hasRole($user, TicketRole::ADMIN)) {
+        if($check_security) {
+            $user = $userManager->getCurrentUser();
+
+            if (\is_object($user)) {
+                if (!$userManager->hasRole($user, TicketRole::ADMIN)) {
+                    $query
+                        ->andWhere('t.userCreated = :userId')
+                        ->setParameter('userId', $user->getId());
+                } else if (!$userManager->hasRole($user, 'assign_tickets')) {
+                    $query
+                        ->andWhere('t.assignedToUser = :userId')
+                        ->setParameter('userId', $user->getId());
+                }
+            } else {
+                // anonymous user
                 $query
                     ->andWhere('t.userCreated = :userId')
-                    ->setParameter('userId', $user->getId());
+                    ->setParameter('userId', 0);
             }
-        } else {
-            // anonymous user
-            $query
-                ->andWhere('t.userCreated = :userId')
-                ->setParameter('userId', 0);
         }
 
         return $query;
@@ -233,7 +253,7 @@ class TicketManager implements TicketManagerInterface
     public function getResolvedTicketOlderThan($days)
     {
         $closeBeforeDate = new \DateTime();
-        $closeBeforeDate->sub(new \DateInterval('P'.$days.'D'));
+        $closeBeforeDate->sub(new \DateInterval('P' . $days . 'D'));
 
         $query = $this->ticketRepository->createQueryBuilder('t')
 //            ->select($this->ticketClass.' t')
@@ -288,4 +308,22 @@ class TicketManager implements TicketManagerInterface
 
         return \array_search($priorityStr, $priorities);
     }
+
+    public function assignTicket(TicketInterface $ticket, UserInterface $toUser)
+    {
+        $ticket->setAssignedToUser($toUser);
+        $this->objectManager->flush();
+    }
+
+    public function canReplyToTicket(TicketInterface $ticket, UserInterface $user)
+    {
+
+        return ((TicketMessageInterface::STATUS_CLOSED != $ticket->getStatus())||((TicketMessageInterface::STATUS_CLOSED == $ticket->getStatus())&&date_diff($ticket->getMessages()->last()->getCreatedAt(),new \DateTime('now'))->days<=5))
+            && (
+                !$ticket->getAssignedToUser() ||
+                $ticket->getAssignedToUser() == $user->getId() ||
+                $ticket->getUserCreated() == $user->getId()
+            );
+    }
+
 }

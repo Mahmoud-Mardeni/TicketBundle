@@ -6,11 +6,16 @@
     </id>
     <field name="userCreated" type="integer" column="user_created_id" precision="0" scale="0" nullable="false"/>
     <field name="lastUser" type="integer" column="last_user_id" precision="0" scale="0" nullable="false"/>
+    <field name="assignedToUser" type="integer" column="assigned_to_user_id" precision="0" scale="0" nullable="true"/>
     <field name="lastMessage" type="datetime" column="last_message" precision="0" scale="0" nullable="false"/>
-    <field name="subject" type="string" column="subject" length="255" precision="0" scale="0" nullable="false"/>
+    <field name="subject" type="string" column="subject" length="40" precision="0" scale="0" nullable="false"/>
     <field name="status" type="smallint" column="status" precision="0" scale="0" nullable="false"/>
     <field name="priority" type="smallint" column="priority" precision="0" scale="0" nullable="false"/>
     <field name="createdAt" type="datetime" column="created_at" precision="0" scale="0" nullable="false"/>
-    <one-to-many field="messages" target-entity="Hackzilla\Bundle\TicketBundle\Entity\TicketMessage" mapped-by="ticket" fetch="LAZY"/>
+    <one-to-many field="messages" target-entity="Hackzilla\Bundle\TicketBundle\Entity\TicketMessage" mapped-by="ticket" fetch="LAZY">
+      <order-by>
+        <order-by-field name="createdAt" direction="ASC" />
+      </order-by>
+    </one-to-many>
   </entity>
 </doctrine-mapping>

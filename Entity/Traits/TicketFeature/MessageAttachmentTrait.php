@@ -4,6 +4,7 @@ namespace Hackzilla\Bundle\TicketBundle\Entity\Traits\TicketFeature;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 trait MessageAttachmentTrait
 {
@@ -11,7 +12,7 @@ trait MessageAttachmentTrait
      * NOTE: This field is not persisted to database!
      *
      * @var File
-     *
+     *@Assert\File(maxSize="2M",mimeTypes={"image/*","application/pdf"}, mimeTypesMessage = "نوع الملف غير متاح")
      * @Vich\UploadableField(mapping="ticket_message_attachment", fileNameProperty="attachmentName")
      */
     protected $attachmentFile;

@@ -29,6 +29,7 @@ class TicketType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'LABEL_SUBJECT',
+                    'attr'=>['maxlength'=>40]
                 ]
             )
             ->add(

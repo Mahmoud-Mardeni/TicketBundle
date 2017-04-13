@@ -40,6 +40,9 @@ class UserLoad
             if (\is_null($entity->getLastUserObject())) {
                 $entity->setLastUser($userRepository->find($entity->getLastUser()));
             }
+            if (\is_null($entity->getAssignedToUserObject())&&$entity->getAssignedToUser()) {
+                $entity->setAssignedToUser($userRepository->find($entity->getAssignedToUser()));
+            }
         } elseif ($entity instanceof TicketMessageInterface) {
             if (\is_null($entity->getUserObject())) {
                 $entity->setUser($userRepository->find($entity->getUser()));

@@ -27,15 +27,16 @@ class UserManager implements UserManagerInterface
     private $userRepository;
 
     /**
-     * @param TokenStorage                  $tokenStorage
+     * @param TokenStorage $tokenStorage
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityRepository              $userRepository
+     * @param EntityRepository $userRepository
      */
     public function __construct(
         TokenStorage $tokenStorage,
         EntityRepository $userRepository,
         AuthorizationCheckerInterface $authorizationChecker
-    ) {
+    )
+    {
         $this->tokenStorage = $tokenStorage;
         $this->userRepository = $userRepository;
         $this->authorizationChecker = $authorizationChecker;
@@ -75,7 +76,7 @@ class UserManager implements UserManagerInterface
      * Current user has permission.
      *
      * @param UserInterface $user
-     * @param string        $role
+     * @param string $role
      *
      * @return bool
      */
@@ -86,15 +87,11 @@ class UserManager implements UserManagerInterface
 
     /**
      * @param \Hackzilla\Bundle\TicketBundle\Model\UserInterface|string $user
-     * @param TicketInterface                                           $ticket
+     * @param TicketInterface $ticket
      */
     public function hasPermission($user, TicketInterface $ticket)
     {
-        if (!\is_object($user) || (!$this->hasRole(
-                    $user,
-                    TicketRole::ADMIN
-                ) && $ticket->getUserCreated() != $user->getId())
-        ) {
+        if (!(is_object($user) && (($ticket->getUserCreated() == $user->getId()) || $this->authorizationChecker->isGranted('assign_tickets') || ($this->hasRole($user, TicketRole::ADMIN) && $ticket->getAssignedToUser() == $user->getId())))) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(403);
         }
     }
