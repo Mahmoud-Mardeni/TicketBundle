@@ -17,10 +17,10 @@ class StatusTransformer implements DataTransformerInterface
     public function transform($number)
     {
         if ($number == TicketMessage::STATUS_CLOSED) {
-            return 1;
+            return true;
         }
 
-        return;
+        return false;
     }
 
     /**

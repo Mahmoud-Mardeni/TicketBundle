@@ -22,4 +22,5 @@ final class TicketEvents
     const TICKET_CREATE = 'hackzilla.ticket.create';
     const TICKET_UPDATE = 'hackzilla.ticket.update';
     const TICKET_DELETE = 'hackzilla.ticket.delete';
+    const TICKET_ASSIGN = 'hackzilla.ticket.assign';
 }

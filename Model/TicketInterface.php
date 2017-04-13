@@ -105,6 +105,9 @@ interface TicketInterface
      */
     public function setLastUser($lastUser);
 
+    public function setAssignedToUser($assignedToUser);
+    public function getAssignedToUser();
+    public function getAssignedToUserObject();
     /**
      * Get lastUser id.
      *

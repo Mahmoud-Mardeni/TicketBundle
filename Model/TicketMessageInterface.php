@@ -153,6 +153,7 @@ interface TicketMessageInterface
     const STATUS_ON_HOLD = 13;
     const STATUS_RESOLVED = 14;
     const STATUS_CLOSED = 15;
+    const STATUS_REOPENED = 16;
 
     const STATUSES = [
         self::STATUS_INVALID               => 'STATUS_INVALID',
@@ -162,6 +163,7 @@ interface TicketMessageInterface
         self::STATUS_ON_HOLD               => 'STATUS_ON_HOLD',
         self::STATUS_RESOLVED              => 'STATUS_RESOLVED',
         self::STATUS_CLOSED                => 'STATUS_CLOSED',
+        self::STATUS_REOPENED              => 'STATUS_REOPENED',
     ];
 
     const PRIORITY_INVALID = 0;

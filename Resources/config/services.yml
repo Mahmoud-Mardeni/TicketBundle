@@ -13,6 +13,9 @@ services:
             - '@hackzilla_ticket.user_repository'
             - '@security.authorization_checker'
 
+    hackzilla_ticket.admins_manager:
+        class: Hackzilla\Bundle\TicketBundle\Manager\AdminsManager
+
     hackzilla_ticket.user_repository:
         class: Doctrine\ORM\EntityRepository
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
@@ -34,6 +37,13 @@ services:
             - '%hackzilla_ticket.model.ticket.class%'
         tags:
             - { name: form.type, alias: hackzilla_ticket }
+
+    hackzilla_ticket.form.type.assignment:
+        class: Hackzilla\Bundle\TicketBundle\Form\Type\AssignmentType
+        arguments:
+            - '@hackzilla_ticket.user_manager'
+        tags:
+            - { name: form.type, alias: hackzilla_ticket_assignment }
 
     hackzilla_ticket.form.type.ticket_message:
         class: Hackzilla\Bundle\TicketBundle\Form\Type\TicketMessageType

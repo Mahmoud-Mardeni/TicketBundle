@@ -3,6 +3,7 @@
 namespace Hackzilla\Bundle\TicketBundle\Entity\Traits;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Hackzilla\Bundle\TicketBundle\Entity\Ticket;
 use Hackzilla\Bundle\TicketBundle\Model\TicketMessageInterface;
 use Hackzilla\Bundle\TicketBundle\Model\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,6 +24,9 @@ trait TicketTrait
      */
     protected $lastUser;
     protected $lastUserObject;
+
+    protected $assignedToUser;
+    protected $assignedToUserObject;
 
     /**
      * @var \DateTime
@@ -367,4 +371,39 @@ trait TicketTrait
     {
         return $this->messages;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAssignedToUser()
+    {
+        return $this->assignedToUser;
+    }
+
+    /**
+     * @param mixed $assignedToUser
+     * @return TicketTrait;
+     */
+    public function setAssignedToUser($assignedToUser)
+    {
+        if (\is_object($assignedToUser)) {
+            $this->assignedToUserObject = $assignedToUser;
+            $this->assignedToUser = $assignedToUser->getId();
+        } else {
+            $this->assignedToUserObject = null;
+            $this->assignedToUser = $assignedToUser;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAssignedToUserObject()
+    {
+        return $this->assignedToUserObject;
+    }
+
+
 }
